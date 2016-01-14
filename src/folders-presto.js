@@ -49,6 +49,7 @@ FoldersPresto.isConfigValid = function(config, cb) {
 
 	assert.equal(typeof (cb), 'function', "argument 'cb' must be a function");
 
+	var checkConfig = config.checkConfig;
 	if (checkConfig == false) {
 		return cb(null, config);
 	}
