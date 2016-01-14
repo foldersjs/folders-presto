@@ -216,7 +216,9 @@ var tbAsFolders = function(prefix, dbName, tbs) {
 
 var showTableMetas = function(prefix, path, cb) {
 
-	var metadatas = ['columns', 'schemas', 'records'];
+	// var metadatas = ['columns', 'schemas', 'records'];
+	var metadatas = ['columns'];
+
 	var out = [];
 	for (var i = 0; i < metadatas.length; i++) {
 		var o = {
