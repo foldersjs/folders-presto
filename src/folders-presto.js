@@ -139,7 +139,7 @@ FoldersPresto.prototype.cat = function(path, cb) {
 		cb(error, null);
 	}
 
-	if (path.tableMetadata == 'columns') {
+	if (path.tableMetadata == 'columns.md') {
 		showTableColumns(this.client, this.prefix, path.database, path.table,
 				cb)
 	} else {
@@ -223,7 +223,7 @@ var showTableMetas = function(prefix, path, cb) {
 	var out = [];
 	for (var i = 0; i < metadatas.length; i++) {
 		var o = {
-			name : metadatas[i]
+			name : metadatas[i] + '.md'
 		};
 		o.fullPath = path + '/' + o.name;
 		o.meta = {};
