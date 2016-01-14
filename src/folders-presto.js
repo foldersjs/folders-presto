@@ -1,6 +1,7 @@
 var presto = require('presto-client');
 // //https://prestodb.io/docs/current/sql.html
 var assert = require('assert');
+var Readable = require('stream').Readable;
 
 var DEFAULT_PRESTO_PREFIX = "/folders.io_0:presto/";
 
@@ -244,7 +245,17 @@ var showTableColumns = function(client, prefix, dbName, tbName, cb) {
 			cb(error, null);
 		}
 
-		cb(null, convertTablesColumnsToTxt(columns, data));
+		var formattedColumnsData = convertTablesColumnsToTxt(columns, data);
+
+		var stream = new Readable();
+		stream.push(formattedColumnsData);
+		stream.push(null);
+
+		cb(null, {
+			'stream' : stream,
+			'size' : formattedColumnsData.length,
+			'name' : dbName + '.' + tbName + '.columns.txt'
+		});
 	});
 };
 
