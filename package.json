@@ -1,0 +1,32 @@
+{
+  "name": "folders-presto",
+  "version": "0.0.1",
+  "description": "Folders module connecting to Presto",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/foldersjs/folders-presto.git"
+  },
+  "author": "",
+  "license": "(Apache-2.0 OR MIT)",
+  "bugs": {
+    "url": "https://github.com/foldersjs/folders-presto/issues"
+  },
+  "main": "./src/folders-presto",
+  "homepage": "https://github.com/foldersjs/folders-presto",
+  "dependencies": {
+    "presto-client": "^0.1.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-esformatter": "^4.0.0",
+    "gulp-eslint": "^0.15.0"
+  },
+  "gitHead": "20c599c3c807dc851c9a7f09b27bd954794aaf9d",
+  "readme": "Folders\n=============\n\nThis node.js package implements the folders.io synthetic file system.\n\nThis Folders Module is based on a amazon web services,\nModule can be installed via \"npm install folders-aws\".\n\nExample:\n\nInstallation (use --save to save to package.json)\n\n```sh\nnpm install folders-aws\n```\n##S3\n\nBasic Usage\n### Configuration\nIn order to access aws services , you must provide credentials . There are 2 ways to provide them \n\n#### Credentials from Environment Variables\nYou can set environment variables to provide sdk credentials . \nThis means that if you properly set your environment variables, \nyou do not need to manage credentials in your application at all.\n\nThe keys names must be as follows:\n\n```\nexport AWS_ACCESS_KEY_ID =  \"your access key id\" \nexport AWS_SECRET_ACCESS_KEY = \"your secreet access key \"\n```\n\n#### Credentials in the constructor\nThis means you can pass credentials directly to the folders-aws constructor object as mentioned in next section .This method is not recommended \n\nif both 'Credentials from Disk' 'and 'Credentials from Environment Variables' are set then former takes precedence over later \n\n### Constructor\n\nProvider constructor, could pass the special option/param in the config param.\n\n```js\nvar FoldersAws = require('folders-aws');\n\nvar config = {\n           accessKeyId: \"Amazon Acess Id\" (String),\n           secretAccessKey : \"Amazon access key\" (String),\n\t\t   service : ['S3','EC2'],\n\t\t   region: ['us-west-2','us-east-1'],\n\t\t   bucket : ['mybucket1','mybucket2'],\n\t\t   partSize: 10 *1024*1024, // (optional) partsize  default is 5 MB \n \t\t   queueSize:5 // (optional) concurrency level\n};\n\nvar aws = new FoldersAws(\"localhost-aws\", config);\n```\nIt is not recommended to provide 'accessKeyId' and 'secretAccessKey' in the constructor directly and use other methods as mentioned\nin configuration section to do this.\n\n###ls\n\n```js\n/**\n * @param uri, the uri to ls\n * @param cb, callback function. \n * ls(uri,cb)\n */\n \naws.ls('s3/us-west-2/mybcuket1/video/', function(err,data) {\n        console.log(\"Folder listing\", data);\n});\n```\n\n\n###cat\n\n\n```js\n\n/**\n * @param uri, the file uri to cat \n * @param cb, callback function.\n * cat(uri,cb) \n */\n\naws.cat('s3/us-west-2/mybcuket1/video/movie.wmv', function(err,result) {\n        console.log(\"Read Stream \", result.stream);\n});\n```\n\n### write\n\n```js\n\n/**\n * @param path, string, the path \n * @param data, the input data, 'stream.Readable' or 'Buffer'\n * @param cb, the callback function\n * write(path,data,cb)\n */\n\nvar writeData = getWriteStreamSomeHow('some_movie.mp4');\n\naws.write('s3/us-west-2/mybcuket1/video/some_movie.mp4',writeData, function(err,result) {\n        console.log(\"Write status \", result);\n});\n```\n\n### unlink\n\n```js\n\n/**\n * @param path, string, the path \n * @param cb, the callback function\n * unlink(path,cb)\n */\n\naws.unlink('/path1/path2/some_movie.mp4', function(err) {\n        \n\t\tif (err){\n\t\t\tconsole.log(\"Got error \",err);\n\t\t}\n});\n```\n\n### rmdir\n\n```js\n\n/**\n * @param path, string, the path \n * @param cb, the callback function\n * rmdir(path,cb)\n */\n\naws.rmdir('/path1/path2/', function(err) {\n        \n\t\tif (err){\n\t\t\tconsole.log(\"Got error \",err);\n\t\t}\n});\n\n### mkdir\n\n```js\n\n/**\n * @param path, string, the path \n * @param cb, the callback function\n * mkdir(path,cb)\n */\n\naws.mkdir('/path1/path2/', function(err) {\n        \n\t\tif (err){\n\t\t\tconsole.log(\"Got error \",err);\n\t\t}\n});\n\n'service' , 'region' and 'bucket' attributes  in 'config' can be 'String' or 'Array' or 'Optional (undefined)'. \n",
+  "readmeFilename": "README.md",
+  "_id": "folders-presto@0.0.1",
+  "_shasum": "0c7229a6ea5af4904eb6b3d290bfacf16c95214c",
+  "_from": "git://github.com/foldersjs/folders-presto.git#master",
+  "_resolved": "git://github.com/foldersjs/folders-presto.git#20c599c3c807dc851c9a7f09b27bd954794aaf9d",
+  "_fromGithub": true
+}
