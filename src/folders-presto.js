@@ -37,7 +37,7 @@ FoldersPresto.prototype.configure = function(options) {
 FoldersPresto.prototype.features = FoldersPresto.features = {
 	cat : true,
 	ls : true,
-	write : true,
+	write : false,
 	server : false
 };
 
