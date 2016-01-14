@@ -2,6 +2,7 @@ var presto = require('presto-client');
 // //https://prestodb.io/docs/current/sql.html
 var assert = require('assert');
 var Readable = require('stream').Readable;
+var tableFormatter = require('markdown-table');
 
 var DEFAULT_PRESTO_PREFIX = "/folders.io_0:presto/";
 
@@ -226,8 +227,8 @@ var showTableMetas = function(prefix, path, cb) {
 		o.uri = prefix + o.fullPath;
 		// FIXME can't get the size.
 		o.size = 0;
-		o.extension = 'txt';
-		o.type = "text/plain";
+		o.extension = 'md';
+		o.type = "text/markdown";
 		o.modificationTime = 0;
 		out.push(o);
 	}
@@ -245,8 +246,18 @@ var showTableColumns = function(client, prefix, dbName, tbName, cb) {
 			cb(error, null);
 		}
 
-		var formattedColumnsData = convertTablesColumnsToTxt(columns, data);
+		// convert the title of columns.
+		var title = [];
+		for (var i = 0; i < columns.length; i++) {
+			title.push(columns[i].name);
+		}
+		// insert the titils line before the first row
+		data.unshift(title);
 
+		// format the columns data include the title into markdown table
+		var formattedColumnsData = tableFormatter(data);// ,{'align': 'c'}
+
+		// create a readable stream
 		var stream = new Readable();
 		stream.push(formattedColumnsData);
 		stream.push(null);
@@ -254,27 +265,7 @@ var showTableColumns = function(client, prefix, dbName, tbName, cb) {
 		cb(null, {
 			'stream' : stream,
 			'size' : formattedColumnsData.length,
-			'name' : dbName + '.' + tbName + '.columns.txt'
+			'name' : dbName + '.' + tbName + '.columns.md'
 		});
 	});
 };
-
-var convertTablesColumnsToTxt = function(titles, columns) {
-	var fieldSeparator = '|';
-	var recordSeparator = '\n';
-
-	var columnTitle = '';
-	for (var i = 0; i < titles.length; i++) {
-		columnTitle += titles[i].name + fieldSeparator;
-	}
-	if (columnTitle) {
-		columnTitle = columnTitle.substr(0, columnTitle.length - 1);
-	}
-
-	var out = columnTitle + recordSeparator;
-	for (var j = 0; j < columns.length; j++) {
-		out += columns[j].join(fieldSeparator) + recordSeparator;
-	}
-
-	return out;
-}
