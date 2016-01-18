@@ -139,7 +139,11 @@ FoldersPresto.prototype.cat = function(path, cb) {
 		cb(error, null);
 	}
 
-	if (path.tableMetadata == 'columns.md') {
+	if (path.tableMetadata == 'select.md') {
+		showTableSelect(this.client, this.prefix, path.database, path.table,
+				cb)
+	}
+	else if (path.tableMetadata == 'columns.md') {
 		showTableColumns(this.client, this.prefix, path.database, path.table,
 				cb)
 	} else {
@@ -218,7 +222,7 @@ var tbAsFolders = function(prefix, dbName, tbs) {
 var showTableMetas = function(prefix, path, cb) {
 
 	// var metadatas = ['columns', 'schemas', 'records'];
-	var metadatas = ['columns'];
+	var metadatas = ['columns','select'];
 
 	var out = [];
 	for (var i = 0; i < metadatas.length; i++) {
@@ -239,36 +243,53 @@ var showTableMetas = function(prefix, path, cb) {
 	cb(null, out);
 };
 
+// FIXME: Escape db/tbname as needed.
+var showTableSelect = function(client, prefix, dbName, tbName, cb) {
+	// SELECT * dbName.tbName LIMIT 10
+	client.execute('SELECT * FROM ' + dbName + '.' + tbName + ' LIMIT 10', function(
+			error, data, columns) {
+		if (error) {
+			console.log('SELECT * FROM error', error);
+			cb(error, null);
+		}
+		var name = dbName + '.' + tbName + '.select.md'
+		showGenericResult(name, data, columns, cb);
+	});
+};
+
 var showTableColumns = function(client, prefix, dbName, tbName, cb) {
 	// SHOW COLUMNS FROM dbName.tbName
 	client.execute('SHOW COLUMNS FROM ' + dbName + '.' + tbName, function(
 			error, data, columns) {
-
 		if (error) {
 			console.log('SHOW COLUMNS error', error);
 			cb(error, null);
 		}
+		var name = dbName + '.' + tbName + '.columns.md'
+		showGenericResult(name, data, columns, cb);
+	});
+};
 
-		// convert the title of columns.
-		var title = [];
-		for (var i = 0; i < columns.length; i++) {
-			title.push(columns[i].name);
-		}
-		// insert the titils line before the first row
-		data.unshift(title);
+var showGenericResult = function(name, data, columns, cb) {
+	// convert the title of columns.
+	var title = [];
+	for (var i = 0; i < columns.length; i++) {
+		title.push(columns[i].name);
+	}
+	// insert the titils line before the first row
+	data.unshift(title);
 
-		// format the columns data include the title into markdown table
-		var formattedColumnsData = tableFormatter(data);// ,{'align': 'c'}
+	// format the columns data include the title into markdown table
+	var formattedColumnsData = tableFormatter(data);// ,{'align': 'c'}
 
-		// create a readable stream
-		var stream = new Readable();
-		stream.push(formattedColumnsData);
-		stream.push(null);
+	// create a readable stream
+	var stream = new Readable();
+	stream.push(formattedColumnsData);
+	stream.push(null);
 
-		cb(null, {
-			'stream' : stream,
-			'size' : formattedColumnsData.length,
-			'name' : dbName + '.' + tbName + '.columns.md'
-		});
+	cb(null, {
+		'stream' : stream,
+		'size' : formattedColumnsData.length,
+		'name' : name
 	});
 };
