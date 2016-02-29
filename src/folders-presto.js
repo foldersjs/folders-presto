@@ -117,22 +117,17 @@ FoldersPresto.prototype.getPrestoPath = function(path, prefix) {
  */
 FoldersPresto.prototype.ls = function(path, cb) {
 	path = this.getPrestoPath(path, this.prefix);
-	console.log("presto path after parse, ", path);
 	if (path == null || !path.database) {
-		console.log("database name not specified, ls root");
 		showDatabases(this.client, this.prefix, cb);
 	} else if (!path.table) {
-		console.log("table name not specified, ls database ", path.database);
 		showTables(this.client, this.prefix, path.database, cb);
 	} else {
-		console.log("show metadata of table, we currently just support column");
 		showTableMetas(this.prefix, path.database + '/' + path.table, cb);
 	}
 };
 
 FoldersPresto.prototype.cat = function(path, cb) {
 	path = this.getPrestoPath(path, this.prefix);
-	console.log("presto path after parse, ", path);
 	if (path == null || !path.database || !path.table || !path.tableMetadata) {
 		var error = "please specify the the database,table and metadata you want in path";
 		console.log(error);
@@ -140,12 +135,10 @@ FoldersPresto.prototype.cat = function(path, cb) {
 	}
 
 	if (path.tableMetadata == 'select.md') {
-		showTableSelect(this.client, this.prefix, path.database, path.table,
-				cb)
+		showTableSelect(this.client, this.prefix, path.database, path.table, cb);
 	}
 	else if (path.tableMetadata == 'columns.md') {
-		showTableColumns(this.client, this.prefix, path.database, path.table,
-				cb)
+		showTableColumns(this.client, this.prefix, path.database, path.table, cb);
 	} else {
 		// NOTES, now supported now
 		cb("not supported yet", null);
@@ -157,7 +150,7 @@ var showDatabases = function(client, prefix, cb) {
 	client.execute('SHOW SCHEMAS', function(error, data, columns) {
 		if (error) {
 			console.log('show shemas error', error);
-			cb(error, null);
+			return cb(error, null);
 		}
 
 		// console.log({'data': data, 'columns':columns});
@@ -193,7 +186,7 @@ var showTables = function(client, prefix, dbName, cb) {
 
 				if (error) {
 					console.log('show TABLES error', error);
-					cb(error, null);
+					return cb(error, null);
 				}
 
 				cb(null, tbAsFolders(prefix, dbName, data));
@@ -250,7 +243,7 @@ var showTableSelect = function(client, prefix, dbName, tbName, cb) {
 			error, data, columns) {
 		if (error) {
 			console.log('SELECT * FROM error', error);
-			cb(error, null);
+			return cb(error, null);
 		}
 		var name = dbName + '.' + tbName + '.select.md'
 		showGenericResult(name, data, columns, cb);
@@ -263,7 +256,7 @@ var showTableColumns = function(client, prefix, dbName, tbName, cb) {
 			error, data, columns) {
 		if (error) {
 			console.log('SHOW COLUMNS error', error);
-			cb(error, null);
+			return cb(error, null);
 		}
 		var name = dbName + '.' + tbName + '.columns.md'
 		showGenericResult(name, data, columns, cb);
